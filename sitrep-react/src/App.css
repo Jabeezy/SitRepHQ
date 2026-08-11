@@ -1,0 +1,54 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #050708;
+  color: #c9d6da;
+  font-family: 'Courier New', monospace;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #1a2228;
+}
+
+.logo-group { display: flex; align-items: center; gap: 10px; }
+.logo-badge { width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(46,230,255,0.4)); }
+.logo-text { display: flex; flex-direction: column; }
+.logo { font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #ff9d2e; }
+.sub { font-size: 8px; letter-spacing: 2px; color: #5c6b70; margin-top: 2px; }
+
+.hud-stats { display: flex; gap: 10px; align-items: center; font-size: 11px; letter-spacing: 1px; }
+.live-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #3dff8a; box-shadow: 0 0 8px #3dff8a; margin-right: 6px;
+}
+.live-dot.error { background: #ff9d2e; box-shadow: 0 0 8px #ff9d2e; }
+
+.map-frame {
+  flex: 1;
+  position: relative;
+}
+
+.app-footer {
+  padding: 8px 20px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #5c6b70;
+  border-top: 1px solid #1a2228;
+}
+
+/* Leaflet's default popup styling is light-themed by default — override for
+   the dark aesthetic so popups don't look jarringly out of place */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: #0a0e11;
+  color: #c9d6da;
+  border: 1px solid #1a2228;
+}
+.leaflet-popup-content { font-family: 'Courier New', monospace; font-size: 12px; }
+.leaflet-popup-content a { color: #2ee6ff; }
