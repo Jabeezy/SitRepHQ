@@ -39,14 +39,17 @@ export function useLiveData<T>(
       try {
         const res = await fetcher();
         if (!mountedRef.current) return;
-        if (res.error) {
-          // Backend explicitly reported a problem (e.g. "not configured yet",
-          // or a live fetch failed) — surface it, but don't wipe out data
-          // that's still sitting there from the last successful refresh.
-          setState(prev => ({ ...prev, error: res.error, loading: false }));
-          console.warn(`[${label}] backend reported an error:`, res.error);
+        // The backend's error field is often just informational ("one of 15
+        // zones failed this cycle") rather than "this response has no usable
+        // data" — so data always gets applied when present. Error is only
+        // treated as fatal when there's genuinely no data alongside it.
+        const hasData = res.data !== undefined && res.data !== null;
+        if (hasData) {
+          setState({ data: res.data, error: res.error, lastUpdated: new Date().toISOString(), loading: false });
+          if (res.error) console.warn(`[${label}] partial issue (data still applied):`, res.error);
         } else {
-          setState({ data: res.data, error: null, lastUpdated: new Date().toISOString(), loading: false });
+          setState(prev => ({ ...prev, error: res.error, loading: false }));
+          console.warn(`[${label}] backend reported an error with no data:`, res.error);
         }
       } catch (err) {
         if (!mountedRef.current) return;

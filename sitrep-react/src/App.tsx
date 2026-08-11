@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { useLiveData } from './api/useLiveData';
 import { api } from './api/client';
 import MapView from './components/MapView';
 import type { Quake, Fire, ZonesResponse, DynamicCountry } from './types';
 import './App.css';
+
+type LayerKey = 'zones' | 'dynamic' | 'quakes' | 'fires';
 
 export default function App() {
   const quakes = useLiveData<Quake[]>(
@@ -26,9 +29,6 @@ export default function App() {
   const zonesData = useLiveData<ZonesResponse>(
     async () => {
       const res = await api.zones();
-      // The zones endpoint doesn't use the same {data, error} envelope as the
-      // others — it's {zones, articles: {data, error}} — normalize it here
-      // so useLiveData's generic error-handling still works correctly.
       return { data: res, error: res.articles.error };
     },
     20 * 60_000,
@@ -44,7 +44,19 @@ export default function App() {
     'dynamic-world'
   );
 
-  const anyError = quakes.error || fires.error || zonesData.error || dynamicCountries.error;
+  // Layer toggle selector — same decluttering control as the vanilla version,
+  // now driven by real React state instead of manually flipping CSS display.
+  const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
+    zones: true,
+    dynamic: true,
+    quakes: true,
+    fires: true,
+  });
+  function toggleLayer(key: LayerKey) {
+    setVisibleLayers(prev => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  const anyError = quakes.error || zonesData.error || dynamicCountries.error;
 
   return (
     <div className="app-shell">
@@ -66,12 +78,24 @@ export default function App() {
 
       <div className="map-frame">
         <MapView
-          quakes={quakes.data ?? []}
-          zones={zonesData.data?.zones ?? []}
+          quakes={visibleLayers.quakes ? quakes.data ?? [] : []}
+          zones={visibleLayers.zones ? zonesData.data?.zones ?? [] : []}
           zoneArticles={zonesData.data?.articles.data ?? {}}
-          dynamicCountries={dynamicCountries.data ?? []}
-          fires={fires.data ?? []}
+          dynamicCountries={visibleLayers.dynamic ? dynamicCountries.data ?? [] : []}
+          fires={visibleLayers.fires ? fires.data ?? [] : []}
         />
+
+        <div className="layer-toggles">
+          {(['zones', 'dynamic', 'quakes', 'fires'] as LayerKey[]).map(key => (
+            <button
+              key={key}
+              className={`layer-btn ${visibleLayers[key] ? 'active' : ''}`}
+              onClick={() => toggleLayer(key)}
+            >
+              {key.toUpperCase()}
+            </button>
+          ))}
+        </div>
       </div>
 
       <footer className="app-footer">
