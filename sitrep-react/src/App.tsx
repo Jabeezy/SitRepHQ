@@ -76,6 +76,18 @@ export default function App() {
         </div>
       </header>
 
+      <div className="layer-toolbar">
+        {(['zones', 'dynamic', 'quakes', 'fires'] as LayerKey[]).map(key => (
+          <button
+            key={key}
+            className={`layer-btn ${visibleLayers[key] ? 'active' : ''}`}
+            onClick={() => toggleLayer(key)}
+          >
+            {key.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
       <div className="map-frame">
         <MapView
           quakes={visibleLayers.quakes ? quakes.data ?? [] : []}
@@ -84,18 +96,6 @@ export default function App() {
           dynamicCountries={visibleLayers.dynamic ? dynamicCountries.data ?? [] : []}
           fires={visibleLayers.fires ? fires.data ?? [] : []}
         />
-
-        <div className="layer-toggles">
-          {(['zones', 'dynamic', 'quakes', 'fires'] as LayerKey[]).map(key => (
-            <button
-              key={key}
-              className={`layer-btn ${visibleLayers[key] ? 'active' : ''}`}
-              onClick={() => toggleLayer(key)}
-            >
-              {key.toUpperCase()}
-            </button>
-          ))}
-        </div>
       </div>
 
       <footer className="app-footer">
