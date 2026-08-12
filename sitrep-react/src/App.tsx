@@ -13,6 +13,7 @@ type LayerKey = 'zones' | 'dynamic' | 'quakes' | 'fires';
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [dossier, setDossier] = useState<DossierData | null>(null);
+  const [panelOpen, setPanelOpen] = useState(true);
 
   const quakes = useLiveData<Quake[]>(async () => { const r = await api.earthquakes(); return { data: r.data, error: r.error }; }, 90_000, 'quakes');
   const fires = useLiveData<Fire[]>(async () => { const r = await api.fires(); return { data: r.data, error: r.error }; }, 30 * 60_000, 'fires');
@@ -69,39 +70,44 @@ export default function App() {
           />
         </div>
 
-        <div className="side-panels">
-          {activeTab === 'overview' && (
-            <>
-              <FeedPanel title="CYBER THREAT FEED" loading={cves.loading} error={cves.error}>
-                {cves.data?.slice(0, 10).map((c, i) => <CveRow key={i} item={c} />)}
+        {panelOpen ? (
+          <div className="side-panels">
+            <button className="panel-close-btn" onClick={() => setPanelOpen(false)} title="Hide panel">×</button>
+            {activeTab === 'overview' && (
+              <>
+                <FeedPanel title="CYBER THREAT FEED" loading={cves.loading} error={cves.error}>
+                  {cves.data?.slice(0, 10).map((c, i) => <CveRow key={i} item={c} />)}
+                </FeedPanel>
+                <FeedPanel title="WORLD / GEOPOLITICAL FEED" loading={worldNews.loading} error={worldNews.error}>
+                  {worldNews.data?.slice(0, 10).map((a, i) => <ArticleRow key={i} item={a} />)}
+                </FeedPanel>
+              </>
+            )}
+            {activeTab === 'darkweb' && (
+              <FeedPanel title="BREACH DISCLOSURES — HAVEIBEENPWNED" loading={breaches.loading} error={breaches.error}
+                emptyLabel="This tracks disclosed breaches, not live dark-web forum chatter.">
+                {breaches.data?.map((b, i) => <BreachRow key={i} item={b} />)}
               </FeedPanel>
-              <FeedPanel title="WORLD / GEOPOLITICAL FEED" loading={worldNews.loading} error={worldNews.error}>
-                {worldNews.data?.slice(0, 10).map((a, i) => <ArticleRow key={i} item={a} />)}
+            )}
+            {activeTab === 'threatactors' && (
+              <FeedPanel title="THREAT ACTOR GROUPS — MITRE ATT&CK" loading={threatActors.loading} error={threatActors.error}>
+                {threatActors.data?.map((t, i) => <ThreatActorRow key={i} item={t} />)}
               </FeedPanel>
-            </>
-          )}
-          {activeTab === 'darkweb' && (
-            <FeedPanel title="BREACH DISCLOSURES — HAVEIBEENPWNED" loading={breaches.loading} error={breaches.error}
-              emptyLabel="This tracks disclosed breaches, not live dark-web forum chatter.">
-              {breaches.data?.map((b, i) => <BreachRow key={i} item={b} />)}
-            </FeedPanel>
-          )}
-          {activeTab === 'threatactors' && (
-            <FeedPanel title="THREAT ACTOR GROUPS — MITRE ATT&CK" loading={threatActors.loading} error={threatActors.error}>
-              {threatActors.data?.map((t, i) => <ThreatActorRow key={i} item={t} />)}
-            </FeedPanel>
-          )}
-          {activeTab === 'worldnews' && (
-            <>
-              <FeedPanel title="WORLD NEWS — GDELT / BBC" loading={worldNews.loading} error={worldNews.error}>
-                {worldNews.data?.slice(0, 10).map((a, i) => <ArticleRow key={i} item={a} />)}
-              </FeedPanel>
-              <FeedPanel title="SANCTIONS & EXPORT CONTROLS" loading={sanctionsNews.loading} error={sanctionsNews.error}>
-                {sanctionsNews.data?.slice(0, 10).map((a, i) => <ArticleRow key={i} item={a} />)}
-              </FeedPanel>
-            </>
-          )}
-        </div>
+            )}
+            {activeTab === 'worldnews' && (
+              <>
+                <FeedPanel title="WORLD NEWS — GDELT / BBC" loading={worldNews.loading} error={worldNews.error}>
+                  {worldNews.data?.slice(0, 10).map((a, i) => <ArticleRow key={i} item={a} />)}
+                </FeedPanel>
+                <FeedPanel title="SANCTIONS & EXPORT CONTROLS" loading={sanctionsNews.loading} error={sanctionsNews.error}>
+                  {sanctionsNews.data?.slice(0, 10).map((a, i) => <ArticleRow key={i} item={a} />)}
+                </FeedPanel>
+              </>
+            )}
+          </div>
+        ) : (
+          <button className="panel-reopen-tab" onClick={() => setPanelOpen(true)} title="Show panel">‹</button>
+        )}
       </div>
 
       <footer className="app-footer">

@@ -172,3 +172,20 @@
 .dossier-close { background: none; border: 1px solid #1a2228; color: #c9d6da; font-size: 16px; width: 26px; height: 26px; cursor: pointer; }
 .dossier-label { font-size: 10px; letter-spacing: 2px; color: #ff9d2e; margin-bottom: 8px; }
 .dossier-footer { text-align: center; font-size: 9px; letter-spacing: 1px; color: #5c6b70; margin-top: 10px; padding-top: 10px; border-top: 1px solid #1a2228; }
+
+/* ---- Side panel collapse ---- */
+.side-panels { position: relative; }
+.panel-close-btn {
+  position: sticky; top: 0; right: 0; float: right;
+  background: #0a0e11; border: 1px solid #1a2228; color: #c9d6da;
+  font-size: 16px; width: 26px; height: 26px; cursor: pointer;
+  z-index: 10; margin: 6px;
+}
+.panel-close-btn:hover { border-color: #ff9d2e; color: #ff9d2e; }
+.panel-reopen-tab {
+  width: 22px;
+  background: #0a0e11; border: 1px solid #1a2228; border-right: none;
+  color: #2ee6ff; font-size: 18px; cursor: pointer;
+  writing-mode: vertical-rl;
+}
+.panel-reopen-tab:hover { background: #1a2228; }
