@@ -90,6 +90,25 @@
 .leaflet-popup-content { font-family: 'Courier New', monospace; font-size: 12px; }
 .leaflet-popup-content a { color: #2ee6ff; }
 
+/* Leaflet's zoom controls default to plain white boxes — theme them to match
+   the dark UI, and size them a bit larger for comfortable touch targets */
+.leaflet-control-zoom a {
+  background: #0a0e11 !important;
+  color: #2ee6ff !important;
+  border-color: #1a2228 !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 16px !important;
+}
+.leaflet-control-zoom a:hover { background: #1a2228 !important; }
+.leaflet-control-attribution {
+  background: rgba(5,7,8,0.8) !important;
+  color: #5c6b70 !important;
+  font-size: 9px !important;
+}
+.leaflet-control-attribution a { color: #2ee6ff !important; }
+
 /* ---- Tab bar ---- */
 .tab-bar {
   display: flex;
@@ -111,6 +130,12 @@
 }
 .tab-btn.active { background: #ff9d2e; color: #050708; }
 .tab-btn:last-child { border-right: none; }
+
+@media (max-width: 480px) {
+  .tab-bar { flex-wrap: wrap; }
+  .tab-btn { flex: 1 1 50%; font-size: 9px; padding: 10px 4px; letter-spacing: 0; }
+  .tab-btn:nth-child(2) { border-right: none; }
+}
 
 /* ---- Main content layout: map + side panels ---- */
 .main-content {
@@ -189,3 +214,20 @@
   writing-mode: vertical-rl;
 }
 .panel-reopen-tab:hover { background: #1a2228; }
+
+@media (max-width: 800px) {
+  /* On mobile the panel stacks BELOW the map, not beside it — so a vertical
+     side-tab makes no visual sense here. Turn it into a full-width horizontal
+     bar sitting where the panel would otherwise be. */
+  .panel-reopen-tab {
+    width: 100%;
+    writing-mode: horizontal-tb;
+    padding: 10px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    border: none;
+    border-top: 1px solid #1a2228;
+  }
+  .panel-reopen-tab::after { content: ' SHOW PANEL'; }
+  .panel-close-btn { position: static; float: none; margin: 8px auto 0; display: block; }
+}
