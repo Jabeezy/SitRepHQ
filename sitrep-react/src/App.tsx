@@ -67,6 +67,7 @@ export default function App() {
             dynamicCountries={visibleLayers.dynamic ? dynamicCountries.data ?? [] : []}
             fires={visibleLayers.fires ? fires.data ?? [] : []}
             onSelect={setDossier}
+            resizeKey={panelOpen}
           />
         </div>
 

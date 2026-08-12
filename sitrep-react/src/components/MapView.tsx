@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, CircleMarker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Quake, Fire, ConflictZone, DynamicCountry, ZoneTier, Article } from '../types';
 import type { DossierData } from './Dossier';
@@ -10,6 +11,20 @@ interface MapViewProps {
   dynamicCountries: DynamicCountry[];
   fires: Fire[];
   onSelect: (data: DossierData) => void;
+  resizeKey?: unknown; // pass something that changes (e.g. panelOpen) to trigger a map resize recalculation
+}
+
+// Leaflet caches its internal render size when the map is created — if the
+// container is resized afterward via CSS (like a side panel closing), the
+// map doesn't automatically know to redraw into the new space, leaving a
+// blank gap. This forces Leaflet to re-measure after the layout settles.
+function MapResizeHandler({ watch }: { watch: unknown }) {
+  const map = useMap();
+  useEffect(() => {
+    const id = setTimeout(() => map.invalidateSize(), 300);
+    return () => clearTimeout(id);
+  }, [watch, map]);
+  return null;
 }
 
 const DARK_TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
@@ -22,7 +37,7 @@ const TIER_COLORS: Record<ZoneTier, string> = {
   watch: '#2ee6ff',
 };
 
-export default function MapView({ quakes, zones, zoneArticles, dynamicCountries, fires, onSelect }: MapViewProps) {
+export default function MapView({ quakes, zones, zoneArticles, dynamicCountries, fires, onSelect, resizeKey }: MapViewProps) {
   return (
     <MapContainer
       center={[20, 0]}
@@ -32,6 +47,7 @@ export default function MapView({ quakes, zones, zoneArticles, dynamicCountries,
       style={{ width: '100%', height: '100%', background: '#050708' }}
     >
       <TileLayer url={DARK_TILE_URL} attribution={TILE_ATTRIBUTION} />
+      <MapResizeHandler watch={resizeKey} />
 
       {quakes.map((q, i) => (
         <CircleMarker
